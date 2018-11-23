@@ -1,0 +1,34 @@
+# 使用pvc
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: xxx
+spec:
+  replicas: 1
+  selector:
+    name: xxx
+  template:
+    metadata:
+      labels:
+        name: nginx
+      spec:
+        containers:
+        - name: nginx
+          image: nginx
+          ports:
+          - containerPort: 80
+          volumeMounts:
+            # mountPath对应容器内部的路径
+          - mountPath: /usr/share/nginx/html
+            # name对应volumes的name
+            name: git-volume
+            # subPath 的目的是为了在单一Pod中多次使用同一个volume而设计的。
+            # 例如，像下面的LAMP，可以将同一个volume下的 mysql 和 html目录，
+            # 挂载到不同的挂载点上，这样就不需要为 mysql 和 html 单独创建volume了。
+            # 就是将pv和pvc定义的路径下的html目录挂载到mountPath指定的容器目录中
+            subPath: html
+  volumes:
+  - name: git-volume
+    persistentVolumeClaim:
+      # claimName对应定义的PersistentVolumeClaim里面的metadata的name属性
+      claimName: myclaim

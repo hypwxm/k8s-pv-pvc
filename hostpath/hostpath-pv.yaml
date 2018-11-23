@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hostpath-pv-01
+  labels:
+    app: app1
+spec:
+  # 通常，PV将具有特定的存储容量。 这是使用PV的容量属性设置的。 看到库伯纳斯资源模型，以了解容量预期的单位。
+  capacity:
+    storage: 1Gi # 1Mi
+  accessModes:
+    # ReadWriteOnce：是最基本的方式，可读可写，但只支持被单个Pod挂载。
+    # ReadOnlyMany：可以以只读的方式被多个Pod挂载。
+    # ReadWriteMany：这种存储可以以读写的方式被多个Pod共享。不是每一种存储都支持这三种方式，像共享方式，目前支持的还比较少，比较常用的是NFS。在PVC绑定PV时通常根据两个条件来绑定，一个是存储的大小，另一个就是访问模式。
+    - ReadWriteMany
+  # PV可以有一个类，通过将storageClassName属性设置为StorageClass的名称来指定。 特定类的PV只能绑定到请求该类的PVC。 没有storageClassName的PV没有类，只能绑定到不需要特定类的PVC。
+  storageClassName: slow
+  hostPath: 
+    path: /home/k8s/pv01
